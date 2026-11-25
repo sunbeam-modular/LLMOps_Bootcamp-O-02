@@ -1,0 +1,27 @@
+# consider this as a first stage to compile the code
+FROM eclipse-temurin:21-jdk-noble as builder_stage
+
+WORKDIR /src
+COPY . .
+
+# compile the application
+RUN javac Main.java 
+
+
+# consider this as a second stage to run the application
+FROM eclipse-temurin:21-jre-noble
+
+# create a new user
+RUN useradd --system user1
+
+WORKDIR /app
+COPY --from=builder_stage /src/Main.class .
+
+# run everything using user1 privileges
+USER user1
+
+# add the healthcheck
+HEALTHCHECK CMD curl http://localhost:80
+
+# run the application while starting the container
+CMD java Main

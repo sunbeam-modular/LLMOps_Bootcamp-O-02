@@ -1,0 +1,10 @@
+FROM eclipse-temurin:21-jdk-noble
+WORKDIR /src
+COPY . .
+
+# compile the application to create a class file
+# while building image
+RUN javac Main.java
+
+# run the class file while starting the container# while building image
+CMD java Main
