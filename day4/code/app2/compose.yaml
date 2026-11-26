@@ -1,0 +1,29 @@
+services:
+  container1:
+    image: httpd:alpine
+    ports:
+    - 8100:80
+
+  container2:
+    image: nginx:alpine
+    ports:
+    - 8200:80
+
+  mysql:
+    image: mysql
+
+    # publish port 3306
+    ports:
+    - 3306:3306
+
+    # expose the user root password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+    # attach the volume to the container
+    volumes:
+    - mysql-volume:/var/lib/mysql
+
+volumes:
+  # create a new volume
+  mysql-volume:

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Compose demo</title>
+  <style>
+    body { font-family: sans-serif; max-width: 480px; margin: 40px auto; }
+    li { padding: 4px 0; }
+    #status { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Items</h1>
+  <p id="status">Loading...</p>
+  <ul id="list"></ul>
+
+  <script>
+    fetch("http://backend:8000/items")
+      .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(items => {
+        document.getElementById("status").textContent = items.length + " items from MySQL";
+        const ul = document.getElementById("list");
+        items.forEach(i => {
+          const li = document.createElement("li");
+          li.textContent = i.name + " - $" + Number(i.price).toFixed(2);
+          ul.appendChild(li);
+        });
+      })
+      .catch(e => document.getElementById("status").textContent = "Failed: " + e.message);
+  </script>
+</body>
+</html>

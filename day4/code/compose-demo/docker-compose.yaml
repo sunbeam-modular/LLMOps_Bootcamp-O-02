@@ -1,0 +1,60 @@
+name: mystack
+services:
+  frontend:
+    build: ./frontend
+    ports:
+    - 8300:80
+    depends_on:
+      # first backend container will be created and then the frontend one
+      backend:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "50M"
+ 
+  backend:
+    build: ./backend
+    ports:
+    - 8000:8000
+    environment:
+      DB_HOST: db
+      DB_USER: app
+      DB_PASSWORD: apppass
+      DB_NAME: shop
+    depends_on:
+      # first db container will be created and then the backend one
+      db:
+        condition: service_started
+    healthcheck:
+      test: wget --spider localhost:8000/docs
+      timeout: 3s
+      start_period: 5s
+      interval: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "50M"
+ 
+  db:
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "500M"
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: shop
+      MYSQL_USER: app
+      MYSQL_PASSWORD: apppass
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql-volume:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  mysql-volume:
